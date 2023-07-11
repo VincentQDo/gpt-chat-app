@@ -4,28 +4,6 @@
 	let input = '';
 	let messages = [{ role: 'user', content: 'Hello, AI!' }];
 
-	async function getAIResponse(message: string) {
-		var myHeaders = new Headers();
-		myHeaders.append('Content-Type', 'application/json');
-		myHeaders.append('Authorization', 'Bearer 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');
-
-		var raw = JSON.stringify({
-			model: 'gpt-3.5-turbo',
-			messages: [...messages, { role: 'user', content: message }]
-		});
-
-		var requestOptions = {
-			method: 'POST',
-			headers: myHeaders,
-			body: raw,
-			redirect: 'follow'
-		};
-
-		let response = await fetch('https://api.openai.com/v1/chat/completions', requestOptions);
-		let data = await response.json();
-		return data['choices'][0]['message']['content'];
-	}
-
 	function sendMessage(event: { key: string }) {
 		if (event.key === 'Enter') {
 			messages.push({ role: 'user', content: input });
