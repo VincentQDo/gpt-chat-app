@@ -1,7 +1,7 @@
 import { error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 
-export const POST: RequestHandler = ((
+export const POST: RequestHandler = (async (
 	message: string,
 	messages: { role: string; content: string }[]
 ) => {

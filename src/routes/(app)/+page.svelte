@@ -7,10 +7,10 @@
 	function sendMessage(event: { key: string }) {
 		if (event.key === 'Enter') {
 			messages.push({ role: 'user', content: input });
-			getAIResponse(input).then((response) => {
-				messages.push({ role: 'assistant', content: response });
-				messages = [...messages];
-			});
+			// getAIResponse(input).then((response) => {
+			// 	messages.push({ role: 'assistant', content: response });
+			// 	messages = [...messages];
+			// });
 			input = '';
 		}
 	}
@@ -43,10 +43,10 @@
 			class="px-4 py-2 rounded-lg bg-blue-500"
 			on:click={() => {
 				messages.push({ role: 'user', content: input });
-				getAIResponse(input).then((response) => {
-					messages.push({ role: 'ai', content: response });
-					messages = [...messages];
-				});
+				// getAIResponse(input).then((response) => {
+				// 	messages.push({ role: 'ai', content: response });
+				// 	messages = [...messages];
+				// });
 				input = '';
 			}}>Send</button
 		>
