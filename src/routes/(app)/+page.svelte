@@ -22,8 +22,7 @@
 			};
 
 			const data = await (await fetch('/api', requestOptions)).json();
-			console.log(data);
-			messages.push({ role: 'assistant', content: data });
+			messages.push({ role: 'assistant', content: data.content });
 			messages = [...messages];
 			input = '';
 		}
