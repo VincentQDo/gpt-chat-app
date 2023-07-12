@@ -1,28 +1,26 @@
-import { error } from '@sveltejs/kit';
-import type { RequestHandler } from './$types';
+import { json } from '@sveltejs/kit';
 
-export const POST: RequestHandler = (async (
-	message: string,
-	messages: { role: string; content: string }[]
-) => {
-	const myHeaders = new Headers();
+export async function POST({ request }) {
+	const headers = new Headers();
 	const openAiApiKey = import.meta.env.VITE_OPENAI_KEY;
-	myHeaders.append('Content-Type', 'application/json');
-	myHeaders.append('Authorization', 'Bearer ' + openAiApiKey);
+	headers.append('Content-Type', 'application/json');
+	headers.append('Authorization', 'Bearer ' + openAiApiKey);
 
-	const raw = JSON.stringify({
-		model: 'gpt-3.5-turbo',
-		messages: [...messages, { role: 'user', content: message }]
-	});
+	const body: { model: string; messages: { role: string; content: string }[] } =
+		await request.json();
 
+	const raw = JSON.stringify(body);
+
+	console.log(raw);
 	const requestOptions = {
 		method: 'POST',
-		headers: myHeaders,
+		headers: headers,
 		body: raw,
 		redirect: 'follow' as RequestRedirect
 	};
 
 	const response = await fetch('https://api.openai.com/v1/chat/completions', requestOptions);
 	const data = await response.json();
-	return data['choices'][0]['message']['content'];
-}) satisfies RequestHandler;
+
+	return new Response(JSON.stringify(data.choices[0].message));
+}

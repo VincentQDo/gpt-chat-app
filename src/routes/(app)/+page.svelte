@@ -2,15 +2,29 @@
 	import { onMount } from 'svelte';
 
 	let input = '';
-	let messages = [{ role: 'user', content: 'Hello, AI!' }];
+	let messages = [
+		{
+			role: 'system',
+			content:
+				'You are an expert software engineer who specialized in web development. Your area of expertise are Angular, C#, Svelte, and Javascript. You are also a generally knowledgable person who is approachable and always willing to help teach people'
+		}
+	];
 
-	function sendMessage(event: { key: string }) {
+	async function sendMessage(event: { key: string }) {
 		if (event.key === 'Enter') {
 			messages.push({ role: 'user', content: input });
-			// getAIResponse(input).then((response) => {
-			// 	messages.push({ role: 'assistant', content: response });
-			// 	messages = [...messages];
-			// });
+			const headers = new Headers();
+			headers.append('Content-Type', 'application/json');
+			const requestOptions = {
+				method: 'POST',
+				headers: headers,
+				body: JSON.stringify(messages)
+			};
+
+			const data = await (await fetch('/api', requestOptions)).json();
+			console.log(data);
+			messages.push({ role: 'assistant', content: data });
+			messages = [...messages];
 			input = '';
 		}
 	}
