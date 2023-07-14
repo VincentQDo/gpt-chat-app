@@ -36,5 +36,10 @@
 		"vite": "^4.3.6",
 		"vitest": "^0.32.2"
 	},
-	"type": "module"
+	"type": "module",
+	"dependencies": {
+		"@types/marked": "^5.0.0",
+		"dompurify": "^3.0.5",
+		"marked": "^5.1.1"
+	}
 }

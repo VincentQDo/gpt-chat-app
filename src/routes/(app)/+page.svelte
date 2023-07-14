@@ -5,23 +5,52 @@
 	let messages = [
 		{
 			role: 'system',
-			content:
-				'You are an expert software engineer who specialized in web development. Your area of expertise are Angular, C#, Svelte, and Javascript. You are also a generally knowledgable person who is approachable and always willing to help teach people'
+			content: `Hello! You're currently speaking with an expert software engineer specializing in web development. I have a wealth of experience in Angular, C#, Svelte, and JavaScript. My purpose here is not only to assist but also to teach and help you understand better. Feel free to ask me anything!`
 		}
 	];
 
-	async function sendMessage(event: { key: string }) {
+	async function onKeyboardEnter(event: { key: string }) {
 		if (event.key === 'Enter') {
-			messages.push({ role: 'user', content: input });
-			const headers = new Headers();
-			headers.append('Content-Type', 'application/json');
-			const requestOptions = {
-				method: 'POST',
-				headers: headers,
-				body: JSON.stringify(messages)
-			};
+			sendMessage();
+		}
+	}
 
-			const data = await (await fetch('/api', requestOptions)).json();
+	async function sendMessage() {
+		messages.push({ role: 'user', content: input });
+		const headers = new Headers();
+		headers.append('Content-Type', 'application/json');
+		const requestOptions = {
+			method: 'POST',
+			headers: headers,
+			body: JSON.stringify(messages)
+		};
+
+		const response = await fetch('/api', requestOptions);
+		if (response.body) {
+			const reader = response.body.getReader();
+			let chunks = [];
+			let done = false;
+
+			while (!done) {
+				const { done: chunkDone, value } = await reader.read();
+				if (chunkDone) {
+					done = true;
+				} else {
+					chunks.push(value);
+				}
+			}
+
+			// Concatenate all chunks
+			const concatenatedChunks = chunks.reduce((accumulator, chunk) => {
+				const tmp = new Uint8Array(accumulator.length + chunk.length);
+				tmp.set(accumulator, 0);
+				tmp.set(chunk, accumulator.length);
+				return tmp;
+			}, new Uint8Array());
+
+			const text = new TextDecoder('utf-8').decode(concatenatedChunks);
+			const data = JSON.parse(text);
+
 			messages.push({ role: 'assistant', content: data.content });
 			messages = [...messages];
 			input = '';
@@ -50,18 +79,8 @@
 		<input
 			class="flex-grow px-4 py-2 rounded-lg bg-gray-700"
 			bind:value={input}
-			on:keydown={sendMessage}
+			on:keydown={onKeyboardEnter}
 		/>
-		<button
-			class="px-4 py-2 rounded-lg bg-blue-500"
-			on:click={() => {
-				messages.push({ role: 'user', content: input });
-				// getAIResponse(input).then((response) => {
-				// 	messages.push({ role: 'ai', content: response });
-				// 	messages = [...messages];
-				// });
-				input = '';
-			}}>Send</button
-		>
+		<button class="px-4 py-2 rounded-lg bg-blue-500" on:click={sendMessage}>Send</button>
 	</div>
 </div>
