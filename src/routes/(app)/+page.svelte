@@ -2,7 +2,8 @@
 	import { onMount } from 'svelte';
 
 	let input = '';
-	let messages = [
+	let messages: { role: 
+		; content: string; typing?: boolean }[] = [
 		{
 			role: 'system',
 			content: `Hello! You're currently speaking with an expert software engineer specializing in web development. I have a wealth of experience in Angular, C#, Svelte, and JavaScript. My purpose here is not only to assist but also to teach and help you understand better. Feel free to ask me anything!`
@@ -17,44 +18,87 @@
 
 	async function sendMessage() {
 		messages.push({ role: 'user', content: input });
+		messages = [...messages];
 		const headers = new Headers();
 		headers.append('Content-Type', 'application/json');
+		const bodyObj: { role: string; content: string }[] = [];
+		messages.forEach((e) => {
+			bodyObj.push({ role: e.role, content: e.content });
+		});
 		const requestOptions = {
 			method: 'POST',
 			headers: headers,
-			body: JSON.stringify(messages)
+			body: JSON.stringify(bodyObj)
 		};
 
 		const response = await fetch('/api', requestOptions);
 		if (response.body) {
 			const reader = response.body.getReader();
-			let chunks = [];
-			let done = false;
+			let partialData: string | undefined = '';
 
-			while (!done) {
-				const { done: chunkDone, value } = await reader.read();
-				if (chunkDone) {
-					done = true;
-				} else {
-					chunks.push(value);
-				}
-			}
+			reader
+				.read()
+				.then(function process({
+					done,
+					value
+				}):
+					| Promise<
+							| void
+							| ReadableStreamReadValueResult<Uint8Array>
+							| ReadableStreamReadDoneResult<Uint8Array>
+					  >
+					| undefined {
+					if (done) {
+						return;
+					}
 
-			// Concatenate all chunks
-			const concatenatedChunks = chunks.reduce((accumulator, chunk) => {
-				const tmp = new Uint8Array(accumulator.length + chunk.length);
-				tmp.set(accumulator, 0);
-				tmp.set(chunk, accumulator.length);
-				return tmp;
-			}, new Uint8Array());
+					const decoder = new TextDecoder('utf-8');
+					let data = decoder.decode(value) + partialData;
+					let lines = data.split('\n');
 
-			const text = new TextDecoder('utf-8').decode(concatenatedChunks);
-			const data = JSON.parse(text);
+					if (!data.endsWith('\n')) {
+						partialData = lines.pop();
+					} else {
+						partialData = '';
+					}
 
-			messages.push({ role: 'assistant', content: data.content });
-			messages = [...messages];
-			input = '';
+					lines.forEach((line) => {
+						if (line.startsWith('data: ')) {
+							let json = JSON.parse(line.substring(6));
+							if (json.choices && json.choices[0].delta.content) {
+								typeMessage(json.choices[0].delta.content);
+							}
+						} else if (line === '[DONE]') {
+							// Stream is finished, you could do something here if needed
+							let lastMessage = messages[messages.length - 1];
+							if (lastMessage.role === 'ai-typing') {
+								setTimeout(() => {
+									lastMessage.role = 'ai';
+									lastMessage.typing = false;
+									messages = [...messages]; // Trigger reactivity
+								}, 100);
+							}
+						}
+					});
+
+					return reader.read().then(process);
+				});
 		}
+
+		input = ''; // Clear the input after sending the message
+	}
+
+	async function typeMessage(chunk: string) {
+		let lastMessage = messages[messages.length - 1];
+		if (lastMessage.role !== 'ai-typing') {
+			// Create a new AI-typing message
+			let typingMessage = { role: 'ai-typing', content: '', typing: true };
+			messages = [...messages, typingMessage];
+			lastMessage = typingMessage;
+		}
+		// Append the chunk to the content of the AI-typing message
+		lastMessage.content += chunk;
+		messages = [...messages]; // Trigger reactivity
 	}
 
 	onMount(() => {
@@ -70,6 +114,9 @@
 					class={`px-4 py-2 rounded-lg ${message.role === 'user' ? 'bg-blue-500' : 'bg-gray-600'}`}
 				>
 					{message.content}
+					{#if message.typing}
+						<span class="animate-pulse">|</span>
+					{/if}
 				</div>
 			</div>
 		{/each}
