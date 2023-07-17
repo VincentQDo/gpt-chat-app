@@ -2,8 +2,7 @@
 	import { onMount } from 'svelte';
 
 	let input = '';
-	let messages: { role: 
-		; content: string; typing?: boolean }[] = [
+	let messages: { role: string; content: string; typing?: boolean }[] = [
 		{
 			role: 'system',
 			content: `Hello! You're currently speaking with an expert software engineer specializing in web development. I have a wealth of experience in Angular, C#, Svelte, and JavaScript. My purpose here is not only to assist but also to teach and help you understand better. Feel free to ask me anything!`
