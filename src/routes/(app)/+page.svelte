@@ -18,6 +18,7 @@
 	async function sendMessage() {
 		messages.push({ role: 'user', content: input });
 		messages = [...messages];
+		input = ''; // Clear the input after sending the message
 		const headers = new Headers();
 		headers.append('Content-Type', 'application/json');
 		const bodyObj: { role: string; content: string }[] = [];
@@ -62,17 +63,19 @@
 					}
 
 					lines.forEach((line) => {
-						if (line.startsWith('data: ')) {
-							let json = JSON.parse(line.substring(6));
-							if (json.choices && json.choices[0].delta.content) {
-								typeMessage(json.choices[0].delta.content);
+						if (!line.includes('[DONE]')) {
+							if (line.startsWith('data: ')) {
+								let json = JSON.parse(line.substring(6));
+								if (json.choices && json.choices[0].delta.content) {
+									typeMessage(json.choices[0].delta.content);
+								}
 							}
-						} else if (line === '[DONE]') {
+						} else {
 							// Stream is finished, you could do something here if needed
 							let lastMessage = messages[messages.length - 1];
 							if (lastMessage.role === 'ai-typing') {
 								setTimeout(() => {
-									lastMessage.role = 'ai';
+									lastMessage.role = 'assistant';
 									lastMessage.typing = false;
 									messages = [...messages]; // Trigger reactivity
 								}, 100);
@@ -83,8 +86,6 @@
 					return reader.read().then(process);
 				});
 		}
-
-		input = ''; // Clear the input after sending the message
 	}
 
 	async function typeMessage(chunk: string) {
