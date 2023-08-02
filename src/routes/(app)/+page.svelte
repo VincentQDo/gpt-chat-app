@@ -1,7 +1,8 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import ChatInput from '../../components/ChatInput.svelte';
+	import ChatMessage from '../../components/ChatMessage.svelte';
 
-	let input = '';
 	let messages: { role: string; content: string; typing?: boolean }[] = [
 		{
 			role: 'system',
@@ -9,36 +10,10 @@
 		}
 	];
 
-	const comboKey = {
-		enter: false,
-		shift: false
-	};
-
-	async function onKeyboardEnter(event: { key: string }) {
-		if (event.key === 'Enter') {
-			comboKey.enter = true;
-		} else if (event.key === 'Shift') {
-			comboKey.shift = true;
-		}
-		if (!comboKey.shift && comboKey.enter) {
-			sendMessage();
-		} else if (comboKey.shift && comboKey.enter) {
-		}
-	}
-
-	async function onKeyboardUp(event: { key: string }) {
-		if (event.key === 'Enter') {
-			comboKey.enter = false;
-		} else if (event.key === 'Shift') {
-			comboKey.shift = false;
-		}
-		console.log(comboKey);
-	}
-
-	async function sendMessage() {
-		messages.push({ role: 'user', content: input });
+	async function sendMessage(event: { detail: { input: string } }) {
+		console.log('event dtail', event);
+		messages.push({ role: 'user', content: event.detail.input });
 		messages = [...messages];
-		input = ''; // Clear the input after sending the message
 		const headers = new Headers();
 		headers.append('Content-Type', 'application/json');
 		const bodyObj: { role: string; content: string }[] = [];
@@ -129,26 +104,8 @@
 <div class="h-screen bg-gray-800 text-white flex flex-col">
 	<div class="overflow-auto p-4 space-y-4">
 		{#each messages as message, i (i)}
-			<div class="flex flex-col" class:items-end={message.role === 'user'}>
-				<div
-					class={`px-4 py-2 rounded-lg ${message.role === 'user' ? 'bg-blue-500' : 'bg-gray-600'}`}
-				>
-					{message.content}
-					{#if message.typing}
-						<span class="animate-pulse">|</span>
-					{/if}
-				</div>
-			</div>
+			<ChatMessage {message} />
 		{/each}
 	</div>
-
-	<div class="mt-auto p-4 flex items-center space-x-4 bg-gray-900">
-		<textarea
-			class="flex-grow px-4 py-2 rounded-lg bg-gray-700"
-			bind:value={input}
-			on:keydown={onKeyboardEnter}
-			on:keyup={onKeyboardUp}
-		/>
-		<button class="px-4 py-2 rounded-lg bg-blue-500" on:click={sendMessage}>Send</button>
-	</div>
+	<ChatInput on:sendMessage={sendMessage} />
 </div>
