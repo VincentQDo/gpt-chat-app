@@ -9,10 +9,31 @@
 		}
 	];
 
+	const comboKey = {
+		enter: false,
+		shift: false
+	};
 	async function onKeyboardEnter(event: { key: string }) {
 		if (event.key === 'Enter') {
-			sendMessage();
+			comboKey.enter = true;
+		} else if (event.key === 'Shift') {
+			comboKey.shift = true;
 		}
+		console.log(comboKey);
+		if (event.key === 'Enter') {
+			if (!comboKey.shift) {
+				sendMessage();
+			}
+		}
+	}
+
+	async function onKeyboardUp(event: { key: string }) {
+		if (event.key === 'Enter') {
+			comboKey.enter = false;
+		} else if (event.key === 'Shift') {
+			comboKey.shift = false;
+		}
+		console.log(comboKey);
 	}
 
 	async function sendMessage() {
@@ -127,6 +148,7 @@
 			class="flex-grow px-4 py-2 rounded-lg bg-gray-700"
 			bind:value={input}
 			on:keydown={onKeyboardEnter}
+			on:keyup={onKeyboardUp}
 		/>
 		<button class="px-4 py-2 rounded-lg bg-blue-500" on:click={sendMessage}>Send</button>
 	</div>
