@@ -13,17 +13,16 @@
 		enter: false,
 		shift: false
 	};
+
 	async function onKeyboardEnter(event: { key: string }) {
 		if (event.key === 'Enter') {
 			comboKey.enter = true;
 		} else if (event.key === 'Shift') {
 			comboKey.shift = true;
 		}
-		console.log(comboKey);
-		if (event.key === 'Enter') {
-			if (!comboKey.shift) {
-				sendMessage();
-			}
+		if (!comboKey.shift && comboKey.enter) {
+			sendMessage();
+		} else if (comboKey.shift && comboKey.enter) {
 		}
 	}
 
@@ -144,7 +143,7 @@
 	</div>
 
 	<div class="mt-auto p-4 flex items-center space-x-4 bg-gray-900">
-		<input
+		<textarea
 			class="flex-grow px-4 py-2 rounded-lg bg-gray-700"
 			bind:value={input}
 			on:keydown={onKeyboardEnter}
