@@ -2,6 +2,7 @@
 	import { onMount } from 'svelte';
 	import ChatInput from '../../components/ChatInput.svelte';
 	import ChatMessage from '../../components/ChatMessage.svelte';
+	import { typeMessage } from '../../libs/chatInteractions';
 
 	let messages: { role: string; content: string; typing?: boolean }[] = [
 		{
@@ -33,16 +34,15 @@
 
 			reader
 				.read()
-				.then(function process({
+				.then(async function process({
 					done,
 					value
-				}):
-					| Promise<
-							| void
-							| ReadableStreamReadValueResult<Uint8Array>
-							| ReadableStreamReadDoneResult<Uint8Array>
-					  >
-					| undefined {
+				}): Promise<
+					| void
+					| ReadableStreamReadValueResult<Uint8Array>
+					| ReadableStreamReadDoneResult<Uint8Array>
+					| undefined
+				> {
 					if (done) {
 						return;
 					}
@@ -62,7 +62,10 @@
 							if (line.startsWith('data: ')) {
 								let json = JSON.parse(line.substring(6));
 								if (json.choices && json.choices[0].delta.content) {
-									typeMessage(json.choices[0].delta.content);
+									messages = typeMessage(
+										json.choices[0].delta.content,
+										messages
+									);
 								}
 							}
 						} else {
@@ -81,19 +84,6 @@
 					return reader.read().then(process);
 				});
 		}
-	}
-
-	async function typeMessage(chunk: string) {
-		let lastMessage = messages[messages.length - 1];
-		if (lastMessage.role !== 'ai-typing') {
-			// Create a new AI-typing message
-			let typingMessage = { role: 'ai-typing', content: '', typing: true };
-			messages = [...messages, typingMessage];
-			lastMessage = typingMessage;
-		}
-		// Append the chunk to the content of the AI-typing message
-		lastMessage.content += chunk;
-		messages = [...messages]; // Trigger reactivity
 	}
 
 	onMount(() => {

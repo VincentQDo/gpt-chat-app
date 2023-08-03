@@ -34,7 +34,6 @@
 		} else if (event.key === 'Shift') {
 			comboKey.shift = false;
 		}
-		console.log(comboKey);
 	}
 </script>
 
@@ -45,5 +44,7 @@
 		on:keydown={onKeyboardEnter}
 		on:keyup={onKeyboardUp}
 	/>
-	<button class="px-4 py-2 rounded-lg bg-blue-500" on:click={dispatchMessage}>Send</button>
+	<button class="px-4 py-2 rounded-lg bg-blue-500" on:click={dispatchMessage}
+		>Send</button
+	>
 </div>
