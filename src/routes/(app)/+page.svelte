@@ -12,7 +12,6 @@
 	];
 
 	async function sendMessage(event: { detail: { input: string } }) {
-		console.log('event dtail', event);
 		messages.push({ role: 'user', content: event.detail.input });
 		messages = [...messages];
 		const headers = new Headers();
