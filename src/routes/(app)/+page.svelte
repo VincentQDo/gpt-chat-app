@@ -2,7 +2,7 @@
 	import { onMount } from 'svelte';
 	import ChatInput from '../../components/ChatInput.svelte';
 	import ChatMessage from '../../components/ChatMessage.svelte';
-	import { typeMessage } from '../../libs/chatInteractions';
+	import { processStream } from '../../libs/chatInteractions';
 
 	let messages: { role: string; content: string; typing?: boolean }[] = [
 		{
@@ -29,59 +29,16 @@
 		const response = await fetch('/api', requestOptions);
 		if (response.body) {
 			const reader = response.body.getReader();
-			let partialData: string | undefined = '';
-
-			reader
-				.read()
-				.then(async function process({
-					done,
-					value
-				}): Promise<
-					| void
-					| ReadableStreamReadValueResult<Uint8Array>
-					| ReadableStreamReadDoneResult<Uint8Array>
-					| undefined
-				> {
-					if (done) {
-						return;
-					}
-
-					const decoder = new TextDecoder('utf-8');
-					let data = decoder.decode(value) + partialData;
-					let lines = data.split('\n');
-
-					if (!data.endsWith('\n')) {
-						partialData = lines.pop();
-					} else {
-						partialData = '';
-					}
-
-					lines.forEach((line) => {
-						if (!line.includes('[DONE]')) {
-							if (line.startsWith('data: ')) {
-								let json = JSON.parse(line.substring(6));
-								if (json.choices && json.choices[0].delta.content) {
-									messages = typeMessage(
-										json.choices[0].delta.content,
-										messages
-									);
-								}
-							}
-						} else {
-							// Stream is finished, you could do something here if needed
-							let lastMessage = messages[messages.length - 1];
-							if (lastMessage.role === 'ai-typing') {
-								setTimeout(() => {
-									lastMessage.role = 'assistant';
-									lastMessage.typing = false;
-									messages = [...messages]; // Trigger reactivity
-								}, 100);
-							}
-						}
-					});
-
-					return reader.read().then(process);
-				});
+			await processStream(
+				reader,
+				messages,
+				(
+					newMessages: { role: string; content: string; typing?: boolean }[]
+				) => {
+					console.log('messages callback function here: ', messages);
+					messages = [...newMessages];
+				}
+			);
 		}
 	}
 
