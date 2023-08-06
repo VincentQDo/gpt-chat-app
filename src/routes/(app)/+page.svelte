@@ -29,7 +29,19 @@
 	const sendMessage = async (event: { detail: { input: string } }) => {
 		const input = event.detail.input;
 		messages.push({ role: 'user', content: input });
-		const response: Promise<Response> = await getApiResponse(messages);
+		const response: Response = await getApiResponse(messages);
+		const reader = response.body?.getReader();
+		let value, done;
+		while (!done) {
+			({ value, done } = await reader!.read());
+			const decoder = new TextDecoder('utf-8');
+			const decodedData = decoder.decode(value);
+			const decodedDataArr = decodedData.split('\n');
+			if (!decodedData.includes('[DONE]')) {
+				const actualData = decodedDataArr.filter((e) => e.length > 0);
+				actualData.forEach((e) => console.log(JSON.parse(JSON.parse(e))));
+			}
+		}
 	};
 
 	onMount(() => {
