@@ -18,6 +18,7 @@
 		if (!comboKey.shift && comboKey.enter) {
 			dispatchMessage();
 		} else if (comboKey.shift && comboKey.enter) {
+			//TODO create new line when shft and enter is pressed
 		}
 	}
 
