@@ -1,5 +1,6 @@
 <script lang="ts">
 	export let message: { role: string; content: string; typing?: boolean };
+	console.log('Message here: ', message);
 </script>
 
 <div class="flex flex-col" class:items-end={message.role === 'user'}>
