@@ -39,7 +39,10 @@
 			const decodedDataArr = decodedData.split('\n');
 			if (!decodedData.includes('[DONE]')) {
 				const actualData = decodedDataArr.filter((e) => e.length > 0);
-				actualData.forEach((e) => console.log(JSON.parse(JSON.parse(e))));
+				console.log('actual data here: ', actualData);
+				actualData.forEach((e) =>
+					console.log('Replace string here', JSON.parse(e.slice(5)))
+				);
 			}
 		}
 	};
