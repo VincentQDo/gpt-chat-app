@@ -90,7 +90,9 @@
 <div class="h-screen bg-gray-800 text-white flex flex-col">
 	<div class="overflow-auto p-4 space-y-4">
 		{#each messages as message, i (i)}
-			<ChatMessage {message} />
+			{#if i > 0}
+				<ChatMessage {message} />
+			{/if}
 		{/each}
 	</div>
 	<ChatInput on:sendMessage={sendMessage} />
