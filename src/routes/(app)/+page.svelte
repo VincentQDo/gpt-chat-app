@@ -9,13 +9,44 @@
 		content: string;
 	}
 
-	const messages: Message[] = [
+	interface AiResponseChunk {
+		id: string;
+		created: number;
+		model: string;
+		choices: {
+			delta: { content: string };
+			finish_reason: any;
+			index: number;
+		}[];
+	}
+
+	let messages: Message[] = [
 		{
 			role: 'system',
 			content: `Hello! You're currently speaking with an expert software engineer specializing in web development. I have a wealth of experience in Angular, C#, Svelte, and JavaScript. My purpose here is not only to assist but also to teach and help you understand better. Feel free to ask me anything!`
 		}
 	];
 
+	const decodeAiResponse = (value: any) => {
+		const decoder = new TextDecoder('utf-8');
+		const decodedData = decoder.decode(value);
+		const decodedDataArr = decodedData.split('\n');
+		if (!decodedData.includes('[DONE]')) {
+			const actualData = decodedDataArr.filter((e) => e.length > 0);
+			try {
+				const jsonData: AiResponseChunk[] = actualData.map((e) =>
+					JSON.parse(e.slice(5))
+				);
+				const aiResponse = jsonData.flatMap((e) =>
+					e.choices.flatMap((d) => d.delta.content)
+				);
+				return aiResponse;
+			} catch (error) {
+				console.error(error);
+				console.error('Error while parsing buffer response: ', decodedData);
+			}
+		}
+	};
 	const getApiResponse = (messages: Message[]) => {
 		const header = new Headers();
 		header.append('Content-Type', 'application/json');
@@ -29,21 +60,25 @@
 	const sendMessage = async (event: { detail: { input: string } }) => {
 		const input = event.detail.input;
 		messages.push({ role: 'user', content: input });
+		messages = [...messages];
 		const response: Response = await getApiResponse(messages);
 		const reader = response.body?.getReader();
 		let value, done;
+		let aiResponseFlatten: string[] = [];
+		let isAiTyping = false;
 		while (!done) {
 			({ value, done } = await reader!.read());
-			const decoder = new TextDecoder('utf-8');
-			const decodedData = decoder.decode(value);
-			const decodedDataArr = decodedData.split('\n');
-			if (!decodedData.includes('[DONE]')) {
-				const actualData = decodedDataArr.filter((e) => e.length > 0);
-				console.log('actual data here: ', actualData);
-				actualData.forEach((e) =>
-					console.log('Replace string here', JSON.parse(e.slice(5)))
-				);
+			aiResponseFlatten = [
+				...aiResponseFlatten.concat(decodeAiResponse(value) as string[])
+			];
+			const aiReply = aiResponseFlatten.join('');
+			if (!isAiTyping) {
+				messages.push({ role: 'assistant', content: aiReply });
+			} else {
+				messages[messages.length - 1].content = aiReply;
 			}
+			messages = [...messages];
+			isAiTyping = true;
 		}
 	};
 
