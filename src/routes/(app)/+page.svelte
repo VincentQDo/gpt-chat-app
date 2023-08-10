@@ -27,10 +27,22 @@
 		}
 	];
 
+	// This is here to track incomplete data from the buffer. The bugger could give us half the response in one chunk and the other half in another
+	// This is here to help facilitate that partial chunk
+	let partialData: string | undefined = '';
+
 	const decodeAiResponse = (value: any) => {
 		const decoder = new TextDecoder('utf-8');
-		const decodedData = decoder.decode(value);
+		const decodedData = decoder.decode(value) + partialData;
 		const decodedDataArr = decodedData.split('\n');
+		// If the buffer response doesn't end with new line that means the last
+		// resposne from the chunk is incomplete. pop that response out and keep that in the running partial data
+		// and we will decode that piece with a later chunk
+		if (!decodedData.endsWith('\n')) {
+			partialData = decodedDataArr.pop();
+		} else {
+			partialData = '';
+		}
 		if (!decodedData.includes('[DONE]')) {
 			const actualData = decodedDataArr.filter((e) => e.length > 0);
 			try {
