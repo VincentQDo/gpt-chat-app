@@ -34,7 +34,7 @@
 	const decodeAiResponse = (value: any) => {
 		const decoder = new TextDecoder('utf-8');
 		const decodedData = decoder.decode(value) + partialData;
-		console.log('decoded and partial data here: ', decodedData, partialData);
+		console.log('decoded data:\n ', decodedData);
 
 		const decodedDataArr = decodedData.split('\n');
 		// If the buffer response doesn't end with new line that means the last
@@ -43,17 +43,19 @@
 		if (!decodedData.endsWith('\n')) {
 			partialData = decodedDataArr.pop();
 			console.log(
-				'decoded data does not end with new line. setting partial data',
+				'decoded data does not end with new line. setting partial data\n',
 				partialData
 			);
+			console.log('decodedData array after pop: \n', decodedDataArr);
 		} else {
 			partialData = '';
 		}
 		if (!decodedData.includes('[DONE]')) {
-			const actualData = decodedDataArr.filter((e) => e.length > 0);
+			const actualData = decodedDataArr.filter(
+				(e) => e.length > 0 && e.startsWith('data: ')
+			);
 			try {
 				console.log('data we are trying to parse here: ', decodedDataArr);
-
 				const jsonData: AiResponseChunk[] = actualData.map((e) =>
 					JSON.parse(e.slice(5))
 				);
