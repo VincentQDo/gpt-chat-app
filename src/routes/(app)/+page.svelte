@@ -28,21 +28,21 @@
 		} else {
 			partialData = '';
 		}
-		if (!decodedData.includes('[DONE]')) {
-			const actualData = decodedDataArr.filter((e) => e.length > 0);
-			try {
-				const jsonData: AiResponseChunk[] = actualData.map((e) =>
-					JSON.parse(e.slice(5))
-				);
-				const aiResponse = jsonData.flatMap((e) =>
-					e.choices.flatMap((d) => d.delta.content)
-				);
-				return aiResponse;
-			} catch (error) {
-				console.error(error);
-				console.error('Error while parsing buffer response: ', decodedData);
-				return '{error}';
-			}
+		const actualData = decodedDataArr.filter(
+			(e) => e.length > 0 && !e.includes('[DONE]')
+		);
+		try {
+			const jsonData: AiResponseChunk[] = actualData.map((e) =>
+				JSON.parse(e.slice(5))
+			);
+			const aiResponse = jsonData.flatMap((e) =>
+				e.choices.flatMap((d) => d.delta.content)
+			);
+			return aiResponse;
+		} catch (error) {
+			console.error(error);
+			console.error('Error while parsing buffer response: ', decodedData);
+			return '{error}';
 		}
 	};
 
