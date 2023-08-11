@@ -2,23 +2,8 @@
 	import { onMount } from 'svelte';
 	import ChatInput from '../../components/ChatInput.svelte';
 	import ChatMessage from '../../components/ChatMessage.svelte';
-	import { processStream } from '../../libs/chatInteractions';
-
-	interface Message {
-		role: 'system' | 'user' | 'assistant';
-		content: string;
-	}
-
-	interface AiResponseChunk {
-		id: string;
-		created: number;
-		model: string;
-		choices: {
-			delta: { content: string };
-			finish_reason: any;
-			index: number;
-		}[];
-	}
+	import type { AiResponseChunk, Message } from '../../models/chat-models';
+	import { getApiResponse } from '../../libs/chat-interactions';
 
 	let messages: Message[] = [
 		{
@@ -34,26 +19,18 @@
 	const decodeAiResponse = (value: any) => {
 		const decoder = new TextDecoder('utf-8');
 		const decodedData = partialData + decoder.decode(value);
-		console.log('decoded data:\n ', decodedData);
-
 		const decodedDataArr = decodedData.split('\n');
 		// If the buffer response doesn't end with new line that means the last
 		// resposne from the chunk is incomplete. pop that response out and keep that in the running partial data
 		// and we will decode that piece with a later chunk
 		if (!decodedData.endsWith('\n')) {
 			partialData = decodedDataArr.pop();
-			console.log(
-				'decoded data does not end with new line. setting partial data\n',
-				partialData
-			);
-			console.log('decodedData array after pop: \n', decodedDataArr);
 		} else {
 			partialData = '';
 		}
 		if (!decodedData.includes('[DONE]')) {
 			const actualData = decodedDataArr.filter((e) => e.length > 0);
 			try {
-				console.log('data we are trying to parse here: ', decodedDataArr);
 				const jsonData: AiResponseChunk[] = actualData.map((e) =>
 					JSON.parse(e.slice(5))
 				);
@@ -68,16 +45,7 @@
 			}
 		}
 	};
-	const getApiResponse = (messages: Message[]) => {
-		const header = new Headers();
-		header.append('Content-Type', 'application/json');
-		const requestOptions = {
-			method: 'POST',
-			headers: new Headers(),
-			body: JSON.stringify(messages)
-		};
-		return fetch('/api', requestOptions);
-	};
+
 	const sendMessage = async (event: { detail: { input: string } }) => {
 		const input = event.detail.input;
 		messages.push({ role: 'user', content: input });
