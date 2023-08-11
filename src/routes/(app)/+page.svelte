@@ -28,6 +28,10 @@
 		} else {
 			partialData = '';
 		}
+		// we need to filter out [DONE] from the array because the last chunk of the stream could include useful data
+		// which we would miss if we just do an if condition like so (if (decodedData.includes('[DONE]'))). That if condition
+		// would just completely remove all the data from the last chunk of the response because [DONE] was included
+		// in that chunk
 		const actualData = decodedDataArr.filter(
 			(e) => e.length > 0 && !e.includes('[DONE]')
 		);
