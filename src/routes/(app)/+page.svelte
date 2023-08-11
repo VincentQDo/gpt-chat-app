@@ -33,7 +33,7 @@
 
 	const decodeAiResponse = (value: any) => {
 		const decoder = new TextDecoder('utf-8');
-		const decodedData = decoder.decode(value) + partialData;
+		const decodedData = partialData + decoder.decode(value);
 		console.log('decoded data:\n ', decodedData);
 
 		const decodedDataArr = decodedData.split('\n');
@@ -51,9 +51,7 @@
 			partialData = '';
 		}
 		if (!decodedData.includes('[DONE]')) {
-			const actualData = decodedDataArr.filter(
-				(e) => e.length > 0 && e.startsWith('data: ')
-			);
+			const actualData = decodedDataArr.filter((e) => e.length > 0);
 			try {
 				console.log('data we are trying to parse here: ', decodedDataArr);
 				const jsonData: AiResponseChunk[] = actualData.map((e) =>
