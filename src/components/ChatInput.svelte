@@ -40,7 +40,7 @@
 
 <div class="mt-auto p-4 flex items-center space-x-4 bg-gray-900">
 	<textarea
-		class="py-3 px-5 block w-full border-gray-200 rounded-full text-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400"
+		class="py-3 px-5 block w-full border-gray-200 rounded-full text-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-800 dark:border-gray-700 dark:text-white"
 		bind:value={input}
 		on:keydown={onKeyboardEnter}
 		on:keyup={onKeyboardUp}
