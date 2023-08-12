@@ -10,3 +10,8 @@ export const getApiResponse = (messages: Message[]) => {
 	};
 	return fetch('/api', requestOptions);
 };
+
+export const scrollBottom = (element: HTMLElement) => {
+	const eleHeight = element.scrollHeight;
+	element.scrollTop = eleHeight;
+};

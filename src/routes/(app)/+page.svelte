@@ -3,7 +3,7 @@
 	import ChatInput from '../../components/ChatInput.svelte';
 	import ChatMessage from '../../components/ChatMessage.svelte';
 	import type { AiResponseChunk, Message } from '../../models/chat-models';
-	import { getApiResponse } from '../../libs/chat-interactions';
+	import { getApiResponse, scrollBottom } from '../../libs/chat-interactions';
 
 	let messages: Message[] = [
 		{
@@ -15,6 +15,7 @@
 	// This is here to track incomplete data from the buffer. The bugger could give us half the response in one chunk and the other half in another
 	// This is here to help facilitate that partial chunk
 	let partialData: string | undefined = '';
+	let messageContainer: HTMLElement;
 
 	const decodeAiResponse = (value: any) => {
 		const decoder = new TextDecoder('utf-8');
@@ -71,6 +72,7 @@
 				messages[messages.length - 1].content = aiReply;
 			}
 			messages = [...messages];
+			scrollBottom(messageContainer);
 			isAiTyping = true;
 		}
 	};
@@ -81,7 +83,7 @@
 </script>
 
 <div class="container h-full mx-auto bg-gray-800 text-white flex flex-col">
-	<div class="overflow-auto p-4 space-y-4">
+	<div class="overflow-auto p-4 space-y-4" bind:this={messageContainer}>
 		{#each messages as message, i (i)}
 			{#if i > 0}
 				<ChatMessage {message} />
