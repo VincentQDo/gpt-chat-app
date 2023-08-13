@@ -2,7 +2,7 @@
 	export let message: { role: string; content: string };
 
 	const formatMessage = (msgContent: string) => {
-		return msgContent.replace('\n', '<br />');
+		return msgContent.replaceAll('\n', '<br>');
 	};
 </script>
 
