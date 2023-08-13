@@ -1,5 +1,9 @@
 <script lang="ts">
 	export let message: { role: string; content: string };
+
+	const formatMessage = (msgContent: string) => {
+		return msgContent.replace('\n', '<br />');
+	};
 </script>
 
 <div class="flex flex-col" class:items-end={message.role === 'user'}>
@@ -8,6 +12,6 @@
 			message.role === 'user' ? 'bg-blue-500' : 'bg-gray-600'
 		}`}
 	>
-		{message.content}
+		{@html formatMessage(message.content)}
 	</div>
 </div>
