@@ -8,7 +8,11 @@ export async function POST({ request }) {
 
 	const body: { role: string; content: string }[] = await request.json();
 
-	const raw: { model: string; messages: { role: string; content: string }[]; stream: boolean } = {
+	const raw: {
+		model: string;
+		messages: { role: string; content: string }[];
+		stream: boolean;
+	} = {
 		model: 'gpt-3.5-turbo',
 		messages: body,
 		stream: true
@@ -21,7 +25,10 @@ export async function POST({ request }) {
 		redirect: 'follow' as RequestRedirect
 	};
 
-	const openAiResponse = await fetch('https://api.openai.com/v1/chat/completions', requestOptions);
+	const openAiResponse = await fetch(
+		'https://api.openai.com/v1/chat/completions',
+		requestOptions
+	);
 	if (openAiResponse.body) {
 		return new Response(openAiResponse.body);
 	} else {

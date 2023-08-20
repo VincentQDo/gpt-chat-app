@@ -86,7 +86,6 @@
 			scrollBottom(messageContainer);
 			isAiTyping = true;
 		}
-		console.log('convo object here: ', messages);
 	};
 
 	onMount(() => {
