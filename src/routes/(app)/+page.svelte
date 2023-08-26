@@ -44,7 +44,7 @@
 		while (!done) {
 			({ value, done } = await reader!.read());
 			aiResponseFlatten = [
-				...aiResponseFlatten.concat(decodeAiResponse(value) as string[])
+				...aiResponseFlatten.concat(decodeAiResponse(value).aiResponse)
 			];
 			const aiReply = aiResponseFlatten.join('');
 			if (!isAiTyping) {
