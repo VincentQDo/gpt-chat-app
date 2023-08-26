@@ -9,7 +9,6 @@
 		scrollBottom
 	} from '../../libs/chat-interactions';
 	import { dev } from '$app/environment';
-	import Prism from 'prismjs';
 
 	let messages: Message[] = [
 		{
@@ -67,6 +66,7 @@
 	});
 
 	afterUpdate(() => {
+		// @ts-ignore
 		Prism.highlightAll();
 	});
 </script>
