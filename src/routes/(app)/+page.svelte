@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
+	import { afterUpdate, onMount } from 'svelte';
 	import ChatInput from '../../components/ChatInput.svelte';
 	import ChatMessage from '../../components/ChatMessage.svelte';
 	import type { Message } from '../../models/chat-models';
@@ -9,6 +9,7 @@
 		scrollBottom
 	} from '../../libs/chat-interactions';
 	import { dev } from '$app/environment';
+	import Prism from 'prismjs';
 
 	let messages: Message[] = [
 		{
@@ -63,6 +64,10 @@
 
 	onMount(() => {
 		// You may want to fetch the AI's first message from OpenAI's API
+	});
+
+	afterUpdate(() => {
+		Prism.highlightAll();
 	});
 </script>
 
