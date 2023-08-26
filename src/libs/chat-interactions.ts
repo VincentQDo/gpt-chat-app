@@ -36,9 +36,12 @@ export const decodeAiResponse = (value: Uint8Array | undefined) => {
 	// which we would miss if we just do an if condition like so (if (decodedData.includes('[DONE]'))). That if condition
 	// would just completely remove all the data from the last chunk of the response because [DONE] was included
 	// in that chunk
-	const actualData = decodedDataArr.filter(
-		(e) => e.length > 0 && !e.includes('[DONE]')
-	);
+	let isDone = false;
+	const actualData = decodedDataArr.filter((e) => {
+		const isNotEmpty = e.length > 0;
+		isDone = e.includes('[DONE]');
+		return isNotEmpty && !isDone;
+	});
 	try {
 		const jsonData: AiResponseChunk[] = actualData.map((e) =>
 			JSON.parse(e.slice(5))
@@ -46,10 +49,10 @@ export const decodeAiResponse = (value: Uint8Array | undefined) => {
 		const aiResponse = jsonData.flatMap((e) =>
 			e.choices.flatMap((d) => d.delta.content)
 		);
-		return aiResponse;
+		return { aiResponse: aiResponse, done: isDone };
 	} catch (error) {
 		console.error(error);
 		console.error('Error while parsing buffer response: ', decodedData);
-		return '{error}';
+		return { aiResponse: ['{error}'], isDone: true };
 	}
 };
