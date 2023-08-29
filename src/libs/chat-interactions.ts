@@ -39,7 +39,9 @@ export const decodeAiResponse = (value: Uint8Array | undefined) => {
 	let isDone = false;
 	const actualData = decodedDataArr.filter((e) => {
 		const isNotEmpty = e.length > 0;
-		isDone = e.includes('[DONE]');
+		if (!isDone) {
+			isDone = e.includes('[DONE]');
+		}
 		return isNotEmpty && !isDone;
 	});
 	try {
@@ -49,7 +51,8 @@ export const decodeAiResponse = (value: Uint8Array | undefined) => {
 		const aiResponse = jsonData.flatMap((e) =>
 			e.choices.flatMap((d) => d.delta.content)
 		);
-		return { aiResponse: aiResponse, done: isDone };
+
+		return { aiResponse: aiResponse, isDone: isDone };
 	} catch (error) {
 		console.error(error);
 		console.error('Error while parsing buffer response: ', decodedData);

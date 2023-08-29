@@ -2,6 +2,7 @@ import { error } from '@sveltejs/kit';
 import { decodeAiResponse } from '../../libs/chat-interactions';
 import type { Message } from '../../models/chat-models';
 
+const REQUEST_LIMIT = 3;
 async function createOpenAiRequest(body: Message[]) {
 	const headers = new Headers();
 	const openAiApiKey = import.meta.env.VITE_OPENAI_KEY;
@@ -52,11 +53,15 @@ function getSSEResponse(body: Message[]): {
 	const stream = new ReadableStream({
 		async start(controller) {
 			let isDone;
-			while (!isDone) {
+			let requestCounter = 0;
+			while (!isDone && requestCounter < REQUEST_LIMIT) {
+				requestCounter++;
+				console.log(
+					'-----------------------------------Creating new api request-----------------------------------'
+				);
+
 				const openAiResponse = await createOpenAiRequest(body);
 				if (openAiResponse.body) {
-					console.log('Craeted another open ai request: ', body);
-
 					const reader = openAiResponse.body.getReader();
 					let aiResponseFlatten: string[] = [];
 					const aiResponseObj: Message = { role: 'assistant', content: '' };
@@ -77,8 +82,10 @@ function getSSEResponse(body: Message[]): {
 						// Send data to the client using SSE format
 						controller.enqueue(value);
 					}
-					body.push(aiResponseObj);
+
+					// If for some reson openai doesn't return a complete rsponse we add a new user message and make another request
 					if (!isDone) {
+						body.push(aiResponseObj);
 						body.push({ role: 'user', content: 'continue' });
 					}
 				} else {
