@@ -1,9 +1,13 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
+	import { afterUpdate, onMount } from 'svelte';
 	import ChatInput from '../../components/ChatInput.svelte';
 	import ChatMessage from '../../components/ChatMessage.svelte';
-	import type { AiResponseChunk, Message } from '../../models/chat-models';
-	import { getApiResponse, scrollBottom } from '../../libs/chat-interactions';
+	import type { Message } from '../../models/chat-models';
+	import {
+		decodeAiResponse,
+		getApiResponse,
+		scrollBottom
+	} from '../../libs/chat-interactions';
 	import { dev } from '$app/environment';
 
 	let messages: Message[] = [
@@ -26,44 +30,7 @@
 		messages = messages.concat(testMessaages);
 	}
 
-	// This is here to track incomplete data from the buffer. The bugger could give us half the response in one chunk and the other half in another
-	// This is here to help facilitate that partial chunk
-	let partialData: string | undefined = '';
 	let messageContainer: HTMLElement;
-
-	const decodeAiResponse = (value: any) => {
-		const decoder = new TextDecoder('utf-8');
-		const decodedData = partialData + decoder.decode(value);
-		const decodedDataArr = decodedData.split('\n');
-		// If the buffer response doesn't end with new line that means the last
-		// resposne from the chunk is incomplete. pop that response out and keep that in the running partial data
-		// and we will decode that piece with a later chunk
-		if (!decodedData.endsWith('\n')) {
-			partialData = decodedDataArr.pop();
-		} else {
-			partialData = '';
-		}
-		// we need to filter out [DONE] from the array because the last chunk of the stream could include useful data
-		// which we would miss if we just do an if condition like so (if (decodedData.includes('[DONE]'))). That if condition
-		// would just completely remove all the data from the last chunk of the response because [DONE] was included
-		// in that chunk
-		const actualData = decodedDataArr.filter(
-			(e) => e.length > 0 && !e.includes('[DONE]')
-		);
-		try {
-			const jsonData: AiResponseChunk[] = actualData.map((e) =>
-				JSON.parse(e.slice(5))
-			);
-			const aiResponse = jsonData.flatMap((e) =>
-				e.choices.flatMap((d) => d.delta.content)
-			);
-			return aiResponse;
-		} catch (error) {
-			console.error(error);
-			console.error('Error while parsing buffer response: ', decodedData);
-			return '{error}';
-		}
-	};
 
 	const sendMessage = async (event: { detail: { input: string } }) => {
 		const input = event.detail.input;
@@ -77,7 +44,7 @@
 		while (!done) {
 			({ value, done } = await reader!.read());
 			aiResponseFlatten = [
-				...aiResponseFlatten.concat(decodeAiResponse(value) as string[])
+				...aiResponseFlatten.concat(decodeAiResponse(value).aiResponse)
 			];
 			const aiReply = aiResponseFlatten.join('');
 			if (!isAiTyping) {
@@ -96,6 +63,11 @@
 
 	onMount(() => {
 		// You may want to fetch the AI's first message from OpenAI's API
+	});
+
+	afterUpdate(() => {
+		// @ts-ignore
+		Prism.highlightAll();
 	});
 </script>
 
