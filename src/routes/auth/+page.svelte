@@ -1,24 +1,28 @@
 <script>
-	import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth';
-	/**
-	 * @type {any}
-	 */
-	let email;
+	import { getAuth, createUserWithEmailAndPassword,, signInWithEmailAndPassword } from 'firebase/auth';
 
 	/**
-	 * @type {any}
+	 * @type {string}
+	 */
+	let email;
+	/**
+	 * @type {string}
 	 */
 	let password;
-	/**
-	 * @param {string} email
-	 * @param {string} password
-	 */
-	function signUp(email, password) {
-		const auth = getAuth();
+
+	const auth = getAuth();
+
+	const signUp = () => {
 		createUserWithEmailAndPassword(auth, email, password);
+	}
+
+	const signIn = () => {
+		const auth = getAuth();
+		signInWithEmailAndPassword(auth, email, password);
 	}
 </script>
 
 <input type="text" bind:value={email} />
 <input type="text" bind:value={password} />
-<button on:click={() => signUp(email, password)}>Submit</button>
+<button on:click={() => signUp()}>sign up</button>
+<button on:click={() => signIn()}>sign in</button>
