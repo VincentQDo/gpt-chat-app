@@ -14,7 +14,7 @@ async function createOpenAiRequest(body: Message[]) {
 		messages: Message[];
 		stream: boolean;
 	} = {
-		model: 'gpt-3.5-turbo',
+		model: 'gpt-4',
 		messages: body,
 		stream: true
 	};
