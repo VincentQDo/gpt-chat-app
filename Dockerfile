@@ -32,7 +32,7 @@ FROM base
 # Copy node_modules from 'prod-deps' with production dependencies only.
 COPY --from=prod-deps /app/node_modules /app/node_modules
 # Copy built application from 'build' stage
-COPY --from=build /app/dist /app/dist
+COPY --from=build /app/.svelte-kit /app/.svelte-kit
 # Expose the port on which the application will run
 EXPOSE 8000
 # Define the command that will be executed when Docker runs the image.
