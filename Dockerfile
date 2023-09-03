@@ -7,6 +7,7 @@ FROM node:18.6.0-slim AS base
 # In practical terms, Corepack lets you use Yarn,
 # npm, and pnpm without having to install them.
 RUN corepack enable
+RUN corepack prepare pnpm@8.7.0 --activate
 
 # Copy all files from current directory into the '/app' directory 
 # of the Docker image and make it the default working directory.
@@ -17,6 +18,9 @@ WORKDIR /app
 FROM base AS build
 # Install all dependencies (including dev dependencies for build purposes)
 RUN pnpm install
+RUN ls node_modules/
+RUN ls node_modules/vite
+RUN ls node_modules/vite/bin
 # Build the application
 RUN pnpm run build
 
