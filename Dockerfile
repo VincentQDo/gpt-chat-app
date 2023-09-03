@@ -1,14 +1,11 @@
 # Choose base image with Node.js 20 installed
 FROM node:18.6.0-slim AS base
 
-# Set the pnpm home directory and add it to the system PATH
-# This is done to enable usage of pnpm everywhere in the Docker image
-ENV PNPM_HOME="/pnpm"
-ENV PATH="$PNPM_HOME:$PATH"
-
 # Enable corepack. Corepack is a tool that aims to prepare the execution
 # environment for package managers. It's a zero-runtime-dependency package acting as a bridge
-# between Node.js projects and the package managers they are intended to use.
+# between Node.js projects and the package managers they are intended to use.i
+# In practical terms, Corepack lets you use Yarn,
+# npm, and pnpm without having to install them.
 RUN corepack enable
 
 # Copy all files from current directory into the '/app' directory 
@@ -19,8 +16,7 @@ WORKDIR /app
 # New stage for complete build dependencies along with the source code.
 FROM base AS build
 # Install all dependencies (including dev dependencies for build purposes)
-# Reusing the same cache to share previously downloaded packages
-RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --shamefully-hoist --hoist-pattern "*" --frozen-lockfile
+RUN pnpm install
 # Build the application
 RUN pnpm run build
 

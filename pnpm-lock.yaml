@@ -55,6 +55,9 @@ devDependencies:
   eslint-plugin-svelte:
     specifier: ^2.30.0
     version: 2.32.4(eslint@8.46.0)(svelte@4.1.2)
+  pnpm:
+    specifier: ^8.7.1
+    version: 8.7.1
   postcss:
     specifier: ^8.4.25
     version: 8.4.27
@@ -2448,6 +2451,12 @@ packages:
   /playwright-core@1.36.2:
     resolution: {integrity: sha512-sQYZt31dwkqxOrP7xy2ggDfEzUxM1lodjhsQ3NMMv5uGTRDsLxU0e4xf4wwMkF2gplIxf17QMBCodSFgm6bFVQ==}
     engines: {node: '>=16'}
+    hasBin: true
+    dev: true
+
+  /pnpm@8.7.1:
+    resolution: {integrity: sha512-Qbt3EhYUaXFS2k4FLQA7r2/eYz/JoDeG680/3UXG0Ga03LPuY4GgdvCLe+zO3M7ZnWG4VI4bAwk7QpJyfr5eqA==}
+    engines: {node: '>=16.14'}
     hasBin: true
     dev: true
 
