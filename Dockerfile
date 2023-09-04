@@ -11,6 +11,7 @@ RUN corepack prepare npm@9.6.3 --activate
 
 # Copy all files from current directory into the '/app' directory 
 # of the Docker image and make it the default working directory.
+# TODO Optimize these layers
 COPY . /app
 WORKDIR /app
 
