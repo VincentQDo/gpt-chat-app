@@ -7,7 +7,7 @@ FROM node:18.6.0-slim AS base
 # In practical terms, Corepack lets you use Yarn,
 # npm, and pnpm without having to install them.
 RUN corepack enable
-RUN corepack prepare pnpm@8.7.0 --activate
+RUN corepack prepare npm@9.6.3 --activate
 
 # Copy all files from current directory into the '/app' directory 
 # of the Docker image and make it the default working directory.
@@ -17,27 +17,24 @@ WORKDIR /app
 # New stage for complete build dependencies along with the source code.
 FROM base AS build
 # Install all dependencies (including dev dependencies for build purposes)
-RUN pnpm install
-RUN ls node_modules/
-RUN ls node_modules/vite
-RUN ls node_modules/vite/bin
+RUN npm install
 # Build the application
-RUN pnpm run build
+RUN npm run build
 
 # New stage for production dependencies
 FROM build AS prod-deps
 # Copy over everything from the build stage
 COPY --from=build /app /app
 # Then, remove devDependencies.
-RUN pnpm prune --prod
+RUN npm prune --prod
 
 # Final stage: Start with a fresh base image again to keep the final Docker image slim
 FROM base
 # Copy node_modules from 'prod-deps' with production dependencies only.
 COPY --from=prod-deps /app/node_modules /app/node_modules
 # Copy built application from 'build' stage
-COPY --from=build /app/.svelte-kit /app/.svelte-kit
+COPY --from=build /app/build /app/build
 # Expose the port on which the application will run
-EXPOSE 8000
+EXPOSE 3000
 # Define the command that will be executed when Docker runs the image.
-CMD [ "pnpm", "start" ]
+CMD [ "node", "build" ]
