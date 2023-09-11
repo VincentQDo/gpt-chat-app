@@ -1,4 +1,5 @@
 # Choose base image with Node.js 20 installed
+# TODO optimize the build to not copy node_modules and re-org layers for more efficient build.
 FROM node:18.6.0-slim AS base
 
 # Enable corepack. Corepack is a tool that aims to prepare the execution
@@ -11,7 +12,6 @@ RUN corepack prepare npm@9.6.3 --activate
 
 # Copy all files from current directory into the '/app' directory 
 # of the Docker image and make it the default working directory.
-# TODO Optimize these layers
 COPY . /app
 WORKDIR /app
 
@@ -36,7 +36,7 @@ COPY --from=prod-deps /app/node_modules /app/node_modules
 # Copy built application from 'build' stage
 COPY --from=build /app/build /app/build
 # Expose the port on which the application will run
-ENV PORT=3000 ORIGIN=http://localhost:3000
+ENV PORT=3000 ORIGIN=https://avltech.dev
 EXPOSE 3000
 # Define the command that will be executed when Docker runs the image.
 CMD [ "node", "build" ]
