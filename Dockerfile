@@ -36,7 +36,7 @@ COPY --from=prod-deps /app/node_modules /app/node_modules
 # Copy built application from 'build' stage
 COPY --from=build /app/build /app/build
 # Expose the port on which the application will run
-ENV PORT=3000 ORIGIN=https://avltech.dev
+ENV PORT=3000 ORIGIN=https://chat.avltech.dev
 EXPOSE 3000
 # Define the command that will be executed when Docker runs the image.
 CMD [ "node", "build" ]
