@@ -18,7 +18,7 @@ jobs:
       run: docker build . --file Dockerfile --tag gptchat:$(date +%s)
     - name: Save Docker image
       run: |
-        image_id=$(docker images -q myimage)
+        image_id=$(docker images -q gptchat)
         docker save $image_id -o image.tar
     
   publish:
