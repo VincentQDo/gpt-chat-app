@@ -53,10 +53,10 @@
 	});
 </script>
 
-<div class="h-full w-screen bg-gray-800 text-white flex flex-col">
+<div class="h-full w-screen text-white flex flex-col">
 	<div class="overflow-auto p-4 space-y-4" bind:this={messageContainer}>
 		{#each messages as message, i (i)}
-			{#if i > 0}
+			{#if message.role !== 'system'}
 				<ChatMessage {message} />
 			{/if}
 		{/each}
