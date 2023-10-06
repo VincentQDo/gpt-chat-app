@@ -56,6 +56,9 @@ export const decodeAiResponse = (value: Uint8Array | undefined) => {
 	} catch (error) {
 		console.error(error);
 		console.error('Error while parsing buffer response: ', decodedData);
+		if (decodedData.includes('insufficient_quota')) {
+			return { aiResponse: ['Oops we ran out of money!'], isDone: true };
+		}
 		return { aiResponse: ['{error}'], isDone: true };
 	}
 };
