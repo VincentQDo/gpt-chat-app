@@ -26,13 +26,13 @@ FROM build AS prod-deps
 RUN npm ci --omit=dev
 
 # Final stage: Start with a fresh base image again to keep the final Docker image slim
-FROM base
+FROM base 
 # Copy node_modules from 'prod-deps' with production dependencies only.
-COPY --from=prod-deps /app/node_modules /app/node_modules
+COPY --from=prod-deps /app/node_modules ./node_modules
 # Copy built application from 'build' stage
-COPY --from=build /app/build /app/build
+COPY --from=build /app/build ./build
 # Expose the port on which the application will run
-ENV PORT=3000 ORIGIN=*
+ENV PORT=3000 ORIGIN=https://gptchat.avltech.dev
 EXPOSE 3000
 # Define the command that will be executed when Docker runs the image.
 CMD [ "node", "build" ]

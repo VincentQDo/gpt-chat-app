@@ -1,11 +1,12 @@
 import { error } from '@sveltejs/kit';
 import { decodeAiResponse } from '../../libs/chat-interactions';
 import type { Message } from '../../models/chat-models';
+import { env } from '$env/dynamic/private';
 
 const REQUEST_LIMIT = 3;
 async function createOpenAiRequest(body: Message[]) {
 	const headers = new Headers();
-	const openAiApiKey = import.meta.env.VITE_OPENAI_KEY;
+	const openAiApiKey = env.VITE_OPENAI_KEY;
 	headers.append('Content-Type', 'application/json');
 	headers.append('Authorization', 'Bearer ' + openAiApiKey);
 
