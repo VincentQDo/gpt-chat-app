@@ -54,13 +54,10 @@ function getSSEResponse(body: Message[]): {
 	const stream = new ReadableStream({
 		async start(controller) {
 			let isDone;
-			let requestCounter = 0;
-			while (!isDone && requestCounter < REQUEST_LIMIT) {
-				requestCounter++;
-				console.log(
-					'-----------------------------------Creating new api request-----------------------------------'
-				);
-
+			console.log(
+				'-----------------------------------Creating new api request-----------------------------------'
+			);
+			try {
 				const openAiResponse = await createOpenAiRequest(body);
 				if (openAiResponse.body) {
 					const reader = openAiResponse.body.getReader();
@@ -70,9 +67,6 @@ function getSSEResponse(body: Message[]): {
 					let value, done;
 					while (!done) {
 						({ value, done } = await reader.read());
-						if (done) {
-							controller.close();
-						}
 
 						// Process the value and update the response object
 						let aiResponse;
@@ -82,6 +76,9 @@ function getSSEResponse(body: Message[]): {
 
 						// Send data to the client using SSE format
 						controller.enqueue(value);
+						if (done) {
+							controller.close();
+						}
 					}
 
 					// If for some reson openai doesn't return a complete rsponse we add a new user message and make another request
@@ -92,6 +89,9 @@ function getSSEResponse(body: Message[]): {
 				} else {
 					throw error(500, 'Error getting response from openAI');
 				}
+			} catch (error) {
+				console.error(error);
+				throw error;
 			}
 		}
 	});
