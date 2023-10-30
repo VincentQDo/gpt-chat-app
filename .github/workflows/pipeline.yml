@@ -1,0 +1,42 @@
+name: CI/CD pipeline
+
+on:
+  push:
+    branches: ['main']
+  pull_request:
+    branches: ['main']
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Build the Docker image
+        run: docker build . --file Dockerfile --tag gptchat:$(date +%s)
+      - name: Save Docker image
+        run: |
+          image_id=$(docker images -q gptchat)
+          docker save $image_id -o image.tar
+        # Store the image as an artifact
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: myimage
+          path: ./image.tar
+  deploy:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: [build]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: myimage
+      - name: Install SSH Key
+        uses: webfactory/ssh-agent@v0.8.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+      - name: Deploy to server
+        run: scp -P ${{ secrets.SSH_PORT }} myimage ${{ secrets.SERVER_USER }}:${{ secrets.SERVER_IP }}:${{ secrets.DESTINATION_PATH }}
