@@ -39,9 +39,9 @@
 	const signUp = () => {
 		errorText = 'Please contact Vincent Do for access';
 		console.log(email, password);
-		createUserWithEmailAndPassword(auth, email, password).catch((error) => {
-			errorText = error.code;
-		});
+		// createUserWithEmailAndPassword(auth, email, password).catch((error) => {
+		// 	errorText = error.code;
+		// });
 	};
 
 	const signIn = () => {
@@ -58,7 +58,7 @@
 	};
 </script>
 
-<div class="container">
+<form class="container dark:bg-gray-800 h-full w-screen">
 	<label
 		for="input-label"
 		class="block text-sm font-medium mb-2 dark:text-white">Email</label
@@ -90,7 +90,7 @@
 	</button>
 	<button
 		on:click={() => signIn()}
-		type="button"
+		type="submit"
 		class="py-2 px-3 inline-flex justify-center items-center gap-2 rounded-md border border-transparent font-semibold bg-blue-500 text-white hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all text-sm dark:focus:ring-offset-gray-800"
 	>
 		Sign In
@@ -121,4 +121,4 @@
 			</div>
 		</div>
 	</div>
-</div>
+</form>
