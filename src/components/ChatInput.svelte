@@ -1,7 +1,8 @@
 <script lang="ts">
-	import { createEventDispatcher } from 'svelte';
+	import { createEventDispatcher, onMount } from 'svelte';
 
 	let input = '';
+	let modelList: string[] = [];
 
 	const dispatch = createEventDispatcher();
 	const comboKey = {
@@ -36,6 +37,8 @@
 			comboKey.shift = false;
 		}
 	}
+
+	onMount(() => {});
 </script>
 
 <div class="mt-auto p-4 flex items-center space-x-4 bg-gray-900">
@@ -48,4 +51,13 @@
 	<button class="px-4 py-2 rounded-lg bg-blue-500" on:click={dispatchMessage}
 		>Send</button
 	>
+
+	<label class="label">
+		<span>Select</span>
+		<select class="select">
+			{#each modelList as model}
+				<option value="">Option 5</option>
+			{/each}
+		</select>
+	</label>
 </div>
