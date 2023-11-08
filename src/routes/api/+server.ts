@@ -15,7 +15,7 @@ async function createOpenAiRequest(body: Message[]) {
 		messages: Message[];
 		stream: boolean;
 	} = {
-		model: 'gpt-4',
+		model: 'gpt-4-1106-preview',
 		messages: body,
 		stream: true
 	};
