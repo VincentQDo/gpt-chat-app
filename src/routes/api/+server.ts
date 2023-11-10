@@ -3,7 +3,6 @@ import { decodeAiResponse } from '../../libs/chat-interactions';
 import type { Message } from '../../models/chat-models';
 import { env } from '$env/dynamic/private';
 
-const REQUEST_LIMIT = 3;
 async function createOpenAiRequest(body: Message[]) {
 	const headers = new Headers();
 	const openAiApiKey = env.VITE_OPENAI_KEY;
