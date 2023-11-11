@@ -51,13 +51,4 @@
 	<button class="px-4 py-2 rounded-lg bg-blue-500" on:click={dispatchMessage}
 		>Send</button
 	>
-
-	<label class="label">
-		<span>Select</span>
-		<select class="select">
-			{#each modelList as model}
-				<option value="">Option 5</option>
-			{/each}
-		</select>
-	</label>
 </div>
