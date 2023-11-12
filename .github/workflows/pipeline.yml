@@ -34,9 +34,18 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: myimage
-      - name: Install SSH Key
-        uses: webfactory/ssh-agent@v0.8.0
+      - name: Load Docker image
+        run: docker load < myimage
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v2
         with:
-          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
-      - name: Deploy to server
-        run: scp -P ${{ secrets.SSH_PORT }} myimage ${{ secrets.SERVER_USER }}:${{ secrets.SERVER_IP }}:${{ secrets.DESTINATION_PATH }}
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+      - name: Tag and Push to Docker Hub
+        run: |
+          image_id=$(docker images -q myimage)
+          docker tag $image_id ${{ secrets.DOCKER_HUB_USERNAME }}/gptchat:latest
+          docker push ${{ secrets.DOCKER_HUB_USERNAME }}/gptchat:latest
+      - name: Trigger Webhook
+        run: |
+          curl -X POST -H "Content-Type: application/json" -d '{"docker_tag": "latest"}' ${{ secrets.WEBHOOK_URL }}
