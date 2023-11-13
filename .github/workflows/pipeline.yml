@@ -45,9 +45,13 @@ jobs:
         with:
           username: ${{ secrets.DOCKER_HUB_USERNAME }}
           password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+      - name: list images
+        run: docker images
+      - name: get image id
+        run: docker images -q gptchat
       - name: Tag and Push to Docker Hub
         run: |
-          image_id=$(docker images -q myimage)
+          image_id=$(docker images -q gptchat)
           docker tag $image_id ${{ secrets.DOCKER_HUB_USERNAME }}/gptchat:latest
           docker push ${{ secrets.DOCKER_HUB_USERNAME }}/gptchat:latest
       - name: Trigger Webhook
