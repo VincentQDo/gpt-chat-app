@@ -18,7 +18,7 @@ jobs:
       - name: list docker images
         run: docker images
       - name: Save Docker image
-        run: docker save -o image.tar gptchat:$(date +%s)
+        run: docker save -o image.tar gptchat
         # Store the image as an artifact
       - name: Upload artifact
         uses: actions/upload-artifact@v3
