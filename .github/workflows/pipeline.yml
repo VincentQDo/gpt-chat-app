@@ -39,7 +39,7 @@ jobs:
       - name: List artifact structure
         run: ls -R
       - name: Load Docker image
-        run: docker load < ${{ github.workspace }}/myimage/image.tar
+        run: docker load < ${{ github.workspace }}/image.tar
       - name: Log in to Docker Hub
         uses: docker/login-action@v2
         with:
