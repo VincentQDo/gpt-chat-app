@@ -18,9 +18,7 @@ jobs:
       - name: list docker images
         run: docker images
       - name: Save Docker image
-        run: |
-          image_id=$(docker images -q gptchat)
-          docker save $image_id -o image.tar gptchat:latest
+        run: docker save -o image.tar gptchat:$(date +%s)
         # Store the image as an artifact
       - name: Upload artifact
         uses: actions/upload-artifact@v3
@@ -36,8 +34,6 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: myimage
-      - name: List cwd
-        run: ls
       - name: List artifact structure
         run: ls -R
       - name: Load Docker image
