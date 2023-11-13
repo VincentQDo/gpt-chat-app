@@ -20,7 +20,7 @@ jobs:
       - name: Save Docker image
         run: |
           image_id=$(docker images -q gptchat)
-          docker save $image_id -o image.tar
+          docker save $image_id -o image.tar gptchat:latest
         # Store the image as an artifact
       - name: Upload artifact
         uses: actions/upload-artifact@v3
