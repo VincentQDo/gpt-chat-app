@@ -34,6 +34,10 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: myimage
+      - name: List cwd
+        run: ls
+      - name: List artifact structure
+        run: ls -R
       - name: Load Docker image
         run: docker load < ${{ github.workspace }}/myimage/image.tar
       - name: Log in to Docker Hub
