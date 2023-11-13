@@ -48,4 +48,7 @@ jobs:
           docker push ${{ secrets.DOCKER_HUB_USERNAME }}/gptchat:latest
       - name: Trigger Webhook
         run: |
-          curl -X POST -H "Content-Type: application/json" -d '{"docker_tag": "latest"}' ${{ secrets.WEBHOOK_URL }}
+          curl -X POST -H "Content-Type: application/json" \
+               -H "${{ secrets.WEBHOOK_SECRET_HEADER }}: ${{ secrets.WEBHOOK_SECRET_VALUE }}" \
+               -d '{"docker_tag": "latest"}' \
+               ${{ secrets.WEBHOOK_URL }}
