@@ -49,6 +49,6 @@ jobs:
       - name: Trigger Webhook
         run: |
           curl -X POST -H "Content-Type: application/json" \
-               -H "${{ secrets.WEBHOOK_SECRET_HEADER }}: ${{ secrets.WEBHOOK_SECRET_VALUE }}" \
+               -H "${{ secrets.WEBHOOK_SECRET_HEADER_VALUE }}" \
                -d '{"docker_tag": "latest"}' \
                ${{ secrets.WEBHOOK_URL }}
