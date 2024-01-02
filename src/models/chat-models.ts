@@ -1,6 +1,12 @@
-export interface Message {
-	role: 'system' | 'user' | 'assistant';
-	content: string;
+export interface NewMesage {
+	chatSessionId: string;
+	senderType: 'system' | 'user' | 'assistant';
+	messageText: string;
+}
+
+export interface Message extends NewMesage {
+	messageId: number;
+	createdAt: Date;
 }
 
 export interface AiResponseChunk {
@@ -12,4 +18,10 @@ export interface AiResponseChunk {
 		finish_reason: string | null | undefined;
 		index: number;
 	}[];
+}
+
+export interface ChatSession {
+	sessionId: string;
+	userUuid: string;
+	createdAt: Date;
 }
