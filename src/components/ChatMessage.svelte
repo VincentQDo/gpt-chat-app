@@ -1,7 +1,8 @@
 <script lang="ts">
 	import showdown from 'showdown';
+	import type { Message } from '../models/chat-models';
 
-	export let message: { role: string; content: string };
+	export let message: Message;
 
 	const formatMessage = (msgContent: string) => {
 		const converter = new showdown.Converter({
@@ -13,12 +14,14 @@
 	};
 </script>
 
-<div class="flex flex-col" class:items-end={message.role === 'user'}>
-	<div
-		class={`px-4 py-2 rounded-lg ${
-			message.role === 'user' ? 'bg-blue-500' : 'bg-gray-600'
-		}`}
+<div class="flex items-end space-x-2 justify-center">
+	<span class="relative flex shrink-0 overflow-hidden rounded-full h-9 w-9"
+		><span
+			class="flex h-full w-full items-center justify-center rounded-full bg-muted"
+		>
+			{message.senderType}
+		</span></span
 	>
-		{@html formatMessage(message.content)}
-	</div>
+	<p class="text-sm text-white">{message.messageText}</p>
 </div>
+<hr class="my-2 border-gray-700" />
