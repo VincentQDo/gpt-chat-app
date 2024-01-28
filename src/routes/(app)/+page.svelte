@@ -9,6 +9,7 @@
 	} from '../../libs/chat-interactions';
 	import { dev } from '$app/environment';
 	import ConversationCard from '../../components/ConversationCard.svelte';
+	import Button from '../../components/Button.svelte';
 
 	let messages: Message[] = [];
 
@@ -19,7 +20,9 @@
 		messages.push({
 			senderType: 'user',
 			messageText: input,
-			createdAt: new Date()
+			createdAt: new Date(),
+			chatSessionId: '',
+			messageId: ''
 		});
 		messages = [...messages];
 		const response: Response = await getApiResponse(messages);
@@ -34,9 +37,15 @@
 			];
 			const aiReply = aiResponseFlatten.join('');
 			if (!isAiTyping) {
-				messages.push({ role: 'assistant', content: aiReply });
+				messages.push({
+					senderType: 'assistant',
+					messageText: aiReply,
+					chatSessionId: '',
+					createdAt: new Date(),
+					messageId: ''
+				});
 			} else {
-				messages[messages.length - 1].content = aiReply;
+				messages[messages.length - 1].messageText = aiReply;
 			}
 			messages = [...messages];
 			isAiTyping = true;
@@ -82,11 +91,8 @@
 				<textarea
 					class="flex w-full rounded-md border border-input px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 flex-1 min-h-[20px] overflow-auto resize-none text-white bg-gray-700"
 					placeholder="Type your message here."
-				/><button
-					class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 h-10 px-4 py-2 text-white bg-gray-700 hover:bg-gray-600 transition-colors duration-200"
-				>
-					Send
-				</button>
+				/>
+				<Button>Send Help</Button>
 			</div>
 		</div>
 	</main>

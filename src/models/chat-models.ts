@@ -5,7 +5,7 @@ export interface NewMesage {
 }
 
 export interface Message extends NewMesage {
-	messageId: number;
+	messageId: string;
 	createdAt: Date;
 }
 
