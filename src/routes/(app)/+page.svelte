@@ -10,6 +10,7 @@
 	import { dev } from '$app/environment';
 	import ConversationCard from '../../components/ConversationCard.svelte';
 	import Button from '../../components/Button.svelte';
+	import { enhance } from '$app/forms';
 
 	let messages: Message[] = [];
 
@@ -87,13 +88,13 @@
 			{/each}
 		</div>
 		<div class="border-t border-gray-700 p-4 bg-gray-800">
-			<div class="flex items-center space-x-2">
+			<form class="flex items-center space-x-2" method="post" use:enhance>
 				<textarea
 					class="flex w-full rounded-md border border-input px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 flex-1 min-h-[20px] overflow-auto resize-none text-white bg-gray-700"
 					placeholder="Type your message here."
 				/>
-				<Button>Send</Button>
-			</div>
+				<Button role="submit">Send</Button>
+			</form>
 		</div>
 	</main>
 </div>
