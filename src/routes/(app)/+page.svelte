@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { afterUpdate, onMount } from 'svelte';
-	import ChatInput from '../../components/ChatInput.svelte';
 	import ChatMessage from '../../components/ChatMessage.svelte';
 	import type { Message } from '../../models/chat-models';
 	import {
@@ -64,6 +63,18 @@
 		// @ts-ignore
 		Prism.highlightAll();
 	});
+
+	// Function to handle key down events in the textarea
+	function handleKeydown(event: KeyboardEvent) {
+		// Check if the enter key was pressed
+		if (event.key === 'Enter' && !event.shiftKey) {
+			// Prevent the default action to avoid a new line insertion
+			event.preventDefault();
+			// Programmatically submit the form
+			const target = event.target as HTMLTextAreaElement;
+			target.form?.requestSubmit();
+		}
+	}
 </script>
 
 <!--
@@ -88,12 +99,24 @@
 			{/each}
 		</div>
 		<div class="border-t border-gray-700 p-4 bg-gray-800">
-			<form class="flex items-center space-x-2" method="post" use:enhance>
+			<form
+				class="flex items-center space-x-2"
+				method="post"
+				action="http://localhost:8080/chat"
+				use:enhance={({ formData, action, cancel }) => {
+					console.log(formData, action);
+					return async ({ result, update }) => {
+						console.log('result here: ', result);
+					};
+				}}
+			>
 				<textarea
+					on:keydown={handleKeydown}
 					class="flex w-full rounded-md border border-input px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 flex-1 min-h-[20px] overflow-auto resize-none text-white bg-gray-700"
 					placeholder="Type your message here."
+					name="inputText"
 				/>
-				<Button role="submit">Send</Button>
+				<Button type="submit">Send</Button>
 			</form>
 		</div>
 	</main>
