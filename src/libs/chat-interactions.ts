@@ -2,13 +2,14 @@ import type { AiResponseChunk, Message } from '../models/chat-models';
 
 export const getApiResponse = (messages: Message[]) => {
 	const header = new Headers();
+	const url = 'http://localhost:8080/chat';
 	header.append('Content-Type', 'application/json');
 	const requestOptions = {
 		method: 'POST',
 		headers: new Headers(),
 		body: JSON.stringify(messages)
 	};
-	return fetch('/api', requestOptions);
+	return fetch(url, requestOptions);
 };
 
 export const scrollBottom = (element: HTMLElement) => {

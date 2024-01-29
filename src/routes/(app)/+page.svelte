@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { afterUpdate, onMount } from 'svelte';
 	import ChatMessage from '../../components/ChatMessage.svelte';
 	import type { Message } from '../../models/chat-models';
 	import {
@@ -9,17 +8,14 @@
 	import { dev } from '$app/environment';
 	import ConversationCard from '../../components/ConversationCard.svelte';
 	import Button from '../../components/Button.svelte';
-	import { enhance } from '$app/forms';
 
 	let messages: Message[] = [];
-
-	let messageContainer: HTMLElement;
-
-	const sendMessage = async (event: { detail: { input: string } }) => {
-		const input = event.detail.input;
+	let inputText: string = '';
+	const sendMessage = async (event: FormDataEvent) => {
+		event.preventDefault();
 		messages.push({
 			senderType: 'user',
-			messageText: input,
+			messageText: inputText,
 			createdAt: new Date(),
 			chatSessionId: '',
 			messageId: ''
@@ -55,32 +51,16 @@
 		}
 	};
 
-	onMount(() => {
-		// You may want to fetch the AI's first message from OpenAI's API
-	});
-
-	afterUpdate(() => {
-		// @ts-ignore
-		Prism.highlightAll();
-	});
-
 	// Function to handle key down events in the textarea
 	function handleKeydown(event: KeyboardEvent) {
-		// Check if the enter key was pressed
 		if (event.key === 'Enter' && !event.shiftKey) {
-			// Prevent the default action to avoid a new line insertion
 			event.preventDefault();
-			// Programmatically submit the form
 			const target = event.target as HTMLTextAreaElement;
 			target.form?.requestSubmit();
 		}
 	}
 </script>
 
-<!--
-// v0 by Vercel.
-// https://v0.dev/t/oOzJOeoGd9C
--->
 <div class="grid h-screen grid-cols-[300px_1fr] dark:bg-gray-900">
 	<aside
 		class="border-r border-gray-700 bg-gray-800 transition-colors duration-200"
@@ -102,15 +82,10 @@
 			<form
 				class="flex items-center space-x-2"
 				method="post"
-				action="http://localhost:8080/chat"
-				use:enhance={({ formData, action, cancel }) => {
-					console.log(formData, action);
-					return async ({ result, update }) => {
-						console.log('result here: ', result);
-					};
-				}}
+				on:submit={sendMessage}
 			>
 				<textarea
+					bind:value={inputText}
 					on:keydown={handleKeydown}
 					class="flex w-full rounded-md border border-input px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 flex-1 min-h-[20px] overflow-auto resize-none text-white bg-gray-700"
 					placeholder="Type your message here."
