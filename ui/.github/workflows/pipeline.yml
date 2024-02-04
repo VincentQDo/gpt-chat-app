@@ -1,0 +1,60 @@
+name: CI/CD pipeline
+
+on:
+  push:
+    branches: ['main']
+  pull_request:
+    branches: ['main']
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Build the Docker image
+        run: docker build . --file Dockerfile --tag gptchat:$(date +%s)
+      - name: list docker images
+        run: docker images
+      - name: Save Docker image
+        run: docker save -o image.tar gptchat
+        # Store the image as an artifact
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: myimage
+          path: ./image.tar
+  deploy:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: [build]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: myimage
+      - name: List artifact structure
+        run: ls -R
+      - name: Load Docker image
+        run: docker load < ${{ github.workspace }}/image.tar
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+      - name: list images
+        run: docker images
+      - name: get image id
+        run: docker images -q gptchat
+      - name: Tag and Push to Docker Hub
+        run: |
+          image_id=$(docker images -q gptchat)
+          docker tag $image_id ${{ secrets.DOCKER_HUB_USERNAME }}/gptchat:latest
+          docker push ${{ secrets.DOCKER_HUB_USERNAME }}/gptchat:latest
+      - name: Trigger Webhook
+        run: |
+          curl -X POST -H "Content-Type: application/json" \
+               -H "${{ secrets.WEBHOOK_SECRET_HEADER_VALUE }}" \
+               -d '{"docker_tag": "latest"}' \
+               ${{ secrets.WEBHOOK_URL }}
