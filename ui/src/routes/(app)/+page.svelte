@@ -1,6 +1,6 @@
 <script lang="ts">
 	import ChatMessage from '../../components/ChatMessage.svelte';
-	import type { Message } from '../../models/chat-models';
+	import type { Message } from '../../../../shared/models/chat-models';
 	import {
 		decodeAiResponse,
 		getApiResponse
@@ -79,11 +79,7 @@
 			{/each}
 		</div>
 		<div class="border-t border-gray-700 p-4 bg-gray-800">
-			<form
-				class="flex items-center space-x-2"
-				method="post"
-				on:submit={sendMessage}
-			>
+			<form class="flex items-center space-x-2" method="post">
 				<textarea
 					bind:value={inputText}
 					on:keydown={handleKeydown}

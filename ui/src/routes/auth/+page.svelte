@@ -7,6 +7,7 @@
 	import { app } from '../../libs/firebase';
 	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
+	import Button from '../../components/Button.svelte';
 
 	/**
 	 * @type {string}
@@ -81,20 +82,8 @@
 		placeholder="password"
 		bind:value={password}
 	/>
-	<button
-		on:click={() => signUp()}
-		type="button"
-		class="py-2 px-3 inline-flex justify-center items-center gap-2 rounded-md border border-transparent font-semibold bg-blue-500 text-white hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all text-sm dark:focus:ring-offset-gray-800"
-	>
-		Sign Up
-	</button>
-	<button
-		on:click={() => signIn()}
-		type="submit"
-		class="py-2 px-3 inline-flex justify-center items-center gap-2 rounded-md border border-transparent font-semibold bg-blue-500 text-white hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all text-sm dark:focus:ring-offset-gray-800"
-	>
-		Sign In
-	</button>
+	<Button on:click={() => signUp()} type="button">Sign Up</Button>
+	<Button on:click={() => signIn()} type="submit">Sign In</Button>
 	<div
 		class="max-w-xs bg-white border rounded-md shadow-lg dark:bg-gray-800 dark:border-gray-700"
 		role="alert"
