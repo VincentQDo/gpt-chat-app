@@ -18,6 +18,24 @@
 		} as Message;
 		messages = [...messages, newMessage];
 		inputText = '';
+		sendMessage(messages);
+	}
+
+	function sendMessage(messages: Message[]) {
+		// send message to backend
+		// don't want to use sveltekit server methods because we want to perform
+		// all these logic on client side so no hosting fee
+		// we host frontend on vercel and let backend on separte hosting service
+		// handle the long lasting request sicne vercel don't allow requests longer than 10s
+		const url = '';
+		fetch(url, {
+			method: 'post',
+			body: JSON.stringify(messages),
+			headers: {
+				Accept: 'application/json',
+				'Content-Type': 'application/json'
+			}
+		}).then((e) => console.log('received data: ', e));
 		console.log('Messages: ', messages);
 	}
 </script>
