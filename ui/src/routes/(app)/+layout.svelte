@@ -21,7 +21,7 @@
 
 <div class="dark:bg-gray-800 h-full w-screen">
 	{#if uuid === ''}
-		<span>Please login</span>a
+		<span class="text-white">Please login</span>
 	{:else}
 		<slot />
 	{/if}

@@ -40,15 +40,11 @@
 	const signUp = () => {
 		errorText = 'Please contact Vincent Do for access';
 		console.log(email, password);
-		// createUserWithEmailAndPassword(auth, email, password).catch((error) => {
-		// 	errorText = error.code;
-		// });
 	};
 
 	const signIn = () => {
 		signInWithEmailAndPassword(auth, email, password)
 			.then((userCredential) => {
-				// What do i need to do inside here?
 				user = userCredential.user;
 				console.log(user);
 				goto('/');

@@ -2,11 +2,12 @@ export interface NewMesage {
 	chatSessionId: string;
 	senderType: 'system' | 'user' | 'assistant';
 	messageText: string;
+	userInitial: string;
 }
 
 export interface Message extends NewMesage {
 	messageId: string;
-	createdAt: Date;
+	createdAt: number;
 }
 
 export interface AiResponseChunk {
