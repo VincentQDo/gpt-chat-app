@@ -27,7 +27,7 @@
 		// all these logic on client side so no hosting fee
 		// we host frontend on vercel and let backend on separte hosting service
 		// handle the long lasting request sicne vercel don't allow requests longer than 10s
-		const url = '';
+		const url = 'http://localhost:3000/chat';
 		fetch(url, {
 			method: 'post',
 			body: JSON.stringify(messages),
